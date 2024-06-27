@@ -1,0 +1,22 @@
+{
+    "items": [
+        {
+            "id": 1,
+            "name": "Milk",
+            "price": 3.99,
+            "description": "Cow's milk with butter"
+        },
+        {
+            "id": 2,
+            "name": "Eggs",
+            "price": 2.99,
+            "description": "Eggs with bacon and cheese"
+        },
+        {
+            "id": 3,
+            "name": "Bread",
+            "price": 1.99,
+            "description": "Whole grain bread with milk"
+        }
+    ]
+}
