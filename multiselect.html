@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="lib/bootstrap-5.3.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="lib/bootstrap-multiselect-1.1.2/css/bootstrap-multiselect.min.css">
+
+    <script src="lib/jquery-3.7.1.min.js"></script>
+    <script src="lib/bootstrap-5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/bootstrap-multiselect-1.1.2/js/bootstrap-multiselect.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@floating-ui/core@1.6.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.6"></script>
+
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #my-multiselect,
+        .multiselect,
+        .multiselect-container {
+            width: 200px;
+        }
+
+        .multiselect-container {
+            overflow-x: hidden;
+        }
+
+        .multiselect-container>button label {
+            display: block;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <h1>Multi Select</h1>
+        <select multiple="multiple" id="my-multiselect" style="max-width: 200px;">
+            <option value="1">one long text one long text one long text one long text</option>
+            <option value="2">two</option>
+            <option value="3">three</option>
+            <option value="4">four</option>
+        </select>
+    </div>
+
+    <script>
+
+        $(document).ready(function () {
+
+            $('#my-multiselect').multiselect({
+                // buttonClass: 'form-select',
+
+                // templates: {
+                //     button: '<button type="button" class="multiselect dropdown-toggle" data-bs-toggle="dropdown"><span class="multiselect-selected-text"></span></button>',
+                // }
+            });
+
+
+        });
+
+        $(document).on('mouseenter', '.multiselect-container button', function () {
+            console.log('hover');
+        })
+
+    </script>
+</body>
+
+</html>
