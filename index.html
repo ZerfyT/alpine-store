@@ -8,6 +8,7 @@
   <title>Alpine Store</title>
   <link rel="stylesheet" href="/style_build.css">
   <script type="module" src="/main.js"></script>
+  <script src="/script.js"></script>
 </head>
 
 <body>
@@ -42,7 +43,8 @@
       <div class="navbar-end">
 
         <!-- Cart -->
-        <div class="dropdown dropdown-end">
+        <div class="dropdown dropdown-end" x-data="{cartItems: [], totalPrice: 0}"
+          @item-added.window="cartItems.push($event.detail); totalPrice += $event.detail.price">
           <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
             <div class="indicator">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
@@ -50,15 +52,27 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              <span class="badge badge-sm indicator-item">8</span>
+              <span class="badge badge-sm indicator-item" x-text="cartItems.length"></span>
             </div>
           </div>
-          <div tabindex="0" class="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow">
+          <div tabindex="0" class="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-64">
             <div class="card-body">
-              <span class="text-lg font-bold">8 Items</span>
-              <span class="text-info">Subtotal: $999</span>
-              <div class="card-actions">
-                <button class="btn btn-primary btn-block">View cart</button>
+              <span class="text-lg font-bold"><span x-text="cartItems.length"></span> Items</span>
+              <span class="text-info">Subtotal: $<span x-text="totalPrice"></span></span>
+
+              <div class="flex flex-col gap-2">
+                <template x-for="item in cartItems" :key="item.id">
+                  <div class="flex flex-row items-center justify-between gap-2 shadow-sm">
+                    <figure class="w-24 rounded"><img src="/public/item-1.webp" alt="Shoes" />
+                    </figure>
+                    <div class="badge badge-info">$<span x-text="item.price"></span></div>
+                    <button class="btn btn-sm btn-circle btn-ghost">✕</button>
+                  </div>
+                </template>
+              </div>
+
+              <div class="divider">
+                <button class="btn btn-sm btn-error">Clear cart</button>
               </div>
             </div>
           </div>
@@ -107,11 +121,11 @@
       <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-10" x-data="{cards: [] }"
         x-init="cards = await (await fetch('data.json')).json()">
 
-        <template x-for="card in cards.items">
+        <template x-for="card in cards.items" :key="card.id">
           <div class="shadow-xl card bg-base-100 w-96 hover:shadow-2xl hover:scale-105 duration-300 cursor-pointer"
-            x-data @click="my_modal_3.showModal()">
+            x-data @click="$dispatch('card-clicked', {card: card})">
             <figure>
-              <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg" alt="Shoes" />
+              <img src="/public/item-1.webp" alt="Shoes" />
             </figure>
             <div class="card-body">
               <h2 class="card-title">
@@ -128,17 +142,31 @@
         </template>
 
       </div>
-
     </div>
 
     <!-- Modal - BEGIN-->
-    <dialog id="my_modal_3" class="modal">
+    <dialog x-data="{ id: '', name: '', price: '', description: '' }" x-ref="modal" id="my_modal_3" class="modal"
+      @card-clicked.window="id=$event.detail.card.id; name = $event.detail.card.name; price = $event.detail.card.price; description = $event.detail.card.description; $refs.modal.showModal()">
       <div class="modal-box">
+
         <form method="dialog">
           <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
         </form>
-        <h3 class="text-lg font-bold">Hello!</h3>
-        <p class="py-4">Press ESC key or click on ✕ button to close</p>
+
+        <div class="mt-4 py-2 px-2">
+          <figure>
+            <img class="rounded-lg" src="/public/item-1.webp" alt="Shoes" />
+          </figure>
+
+          <h3 class="text-lg font-bold" x-text="name"></h3>
+          <div class="badge badge-lg badge-info">$<span x-text="price"></span></div>
+          <p class="py-4" x-text="description"></p>
+          <div class="card-actions justify-end">
+            <button class="btn btn-primary" @click="$dispatch('item-added', {id: id, price: price})">Add to
+              cart</button>
+          </div>
+        </div>
+
 
       </div>
       <form method="dialog" class="modal-backdrop">
@@ -150,9 +178,6 @@
 
 
   </div>
-
-
-
 
 </body>
 
