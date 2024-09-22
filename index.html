@@ -43,8 +43,7 @@
       <div class="navbar-end">
 
         <!-- Cart -->
-        <div class="dropdown dropdown-end" x-data="{cartItems: [], totalPrice: 0}"
-          @item-added.window="cartItems.push($event.detail); totalPrice += $event.detail.price">
+        <div class="dropdown dropdown-end" x-data="cart()" @item-added.window="addItem($event.detail.item)">
           <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
             <div class="indicator">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
@@ -61,18 +60,18 @@
               <span class="text-info">Subtotal: $<span x-text="totalPrice"></span></span>
 
               <div class="flex flex-col gap-2">
-                <template x-for="item in cartItems" :key="item.id">
+                <template x-for="(item, index) in cartItems" :key="index">
                   <div class="flex flex-row items-center justify-between gap-2 shadow-sm">
                     <figure class="w-24 rounded"><img src="/public/item-1.webp" alt="Shoes" />
                     </figure>
                     <div class="badge badge-info">$<span x-text="item.price"></span></div>
-                    <button class="btn btn-sm btn-circle btn-ghost">✕</button>
+                    <button type="button" class="btn btn-sm btn-circle btn-ghost" @click="removeItem(index)">✕</button>
                   </div>
                 </template>
               </div>
 
               <div class="divider">
-                <button class="btn btn-sm btn-error">Clear cart</button>
+                <button class="btn btn-sm btn-error" @click="clearCart()">Clear cart</button>
               </div>
             </div>
           </div>
@@ -162,7 +161,7 @@
           <div class="badge badge-lg badge-info">$<span x-text="price"></span></div>
           <p class="py-4" x-text="description"></p>
           <div class="card-actions justify-end">
-            <button class="btn btn-primary" @click="$dispatch('item-added', {id: id, price: price})">Add to
+            <button class="btn btn-primary" @click="$dispatch('item-added', {item: {id: id, price: price}})">Add to
               cart</button>
           </div>
         </div>
