@@ -117,24 +117,24 @@
     </div>
 
     <div class="container py-4 mx-auto sm:py-10">
-      <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-10" x-data="{cards: [] }"
-        x-init="cards = await (await fetch('data.json')).json()">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" x-data="{cards: [] }"
+        x-init="cards = await (await fetch('https://fakestoreapi.com/products')).json()">
 
-        <template x-for="card in cards.items" :key="card.id">
-          <div class="shadow-xl card bg-base-100 w-96 hover:shadow-2xl hover:scale-105 duration-300 cursor-pointer"
+        <template x-for="card in cards" :key="card.id">
+          <div class="card h-max bg-base-100 shadow-xl hover:shadow-2xl hover:scale-105 duration-300 cursor-pointer"
             x-data @click="$dispatch('card-clicked', {card: card})">
-            <figure>
-              <img src="/public/item-1.webp" alt="Shoes" />
+            <figure class="h-2/6">
+              <img class="h-full object-contain" :src="card.image" alt="Image" />
             </figure>
             <div class="card-body">
               <h2 class="card-title">
-                <span x-text="card.name"></span>
-                <div class="badge badge-secondary">NEW</div>
+                <span x-text="card.title"></span>
+                <div class="badge badge-secondary">$<span x-text="card.price"></span></div>
               </h2>
-              <p x-text="card.description"></p>
+              <!-- description is limited to 2 lines -->
+              <p class="flex-grow-0 truncate" x-text="card.description"></p>
               <div class="justify-end card-actions">
-                <div class="badge badge-outline">Fashion</div>
-                <div class="badge badge-outline">Products</div>
+                <div class="badge badge-outline" x-text="card.category"></div>
               </div>
             </div>
           </div>
