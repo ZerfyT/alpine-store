@@ -6,9 +6,9 @@
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Alpine Store</title>
-  <link rel="stylesheet" href="/style_build.css">
-  <script type="module" src="/main.js"></script>
-  <script src="/script.js"></script>
+  <link rel="stylesheet" type="text/css" href="/style_build.css">
+  <script type="module"  src="/main.js"></script>
+  <script src="/script.js" ></script>
 </head>
 
 <body>
@@ -36,7 +36,7 @@
 
       <!-- Heading -->
       <div class="navbar-center">
-        <a class="text-xl btn btn-ghost">daisyUI</a>
+        <a class="text-xl btn btn-ghost">Alpine Store</a>
       </div>
 
 
@@ -54,17 +54,18 @@
               <span class="badge badge-sm indicator-item" x-text="cartItems.length"></span>
             </div>
           </div>
-          <div tabindex="0" class="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-64">
+          <div tabindex="0" class="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-72 shadow-lg">
             <div class="card-body">
-              <span class="text-lg font-bold"><span x-text="cartItems.length"></span> Items</span>
-              <span class="text-info">Subtotal: $<span x-text="totalPrice"></span></span>
+              <span class="text-xl font-bold"><span x-text="cartItems.length"></span> Items</span>
+              <span class="text-base text-gray-600">Subtotal: $<span x-text="totalPrice"></span></span>
 
-              <div class="flex flex-col gap-2">
+              <div class="flex flex-col gap-3">
                 <template x-for="(item, index) in cartItems" :key="index">
-                  <div class="flex flex-row items-center justify-between gap-2 shadow-sm">
-                    <figure class="w-24 rounded"><img src="/public/item-1.webp" alt="Shoes" />
-                    </figure>
-                    <div class="badge badge-info">$<span x-text="item.price"></span></div>
+                  <div class="flex flex-row items-center justify-between gap-2">
+                    <div class="w-24 h-24">
+                      <img class="rounded object-fill h-full w-full" :src="item.image" alt="Image" />
+                    </div>
+                    <div class="badge badge-accent badge-lg">$<span x-text="item.price"></span></div>
                     <button type="button" class="btn btn-sm btn-circle btn-ghost" @click="removeItem(index)">✕</button>
                   </div>
                 </template>
@@ -95,7 +96,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
-            <span class="badge badge-xs badge-primary indicator-item"></span>
+            <span class="badge badge-xs badge-accent indicator-item"></span>
           </div>
         </button>
 
@@ -105,34 +106,38 @@
     <!-- Navbar - End -->
 
 
-    <div class="min-h-screen hero bg-base-200">
+    <!-- Hero - Start -->
+    <div class="min-h-screen hero bg-base-200" x-data>
       <div class="text-center hero-content">
         <div class="max-w-md">
           <h1 class="text-5xl font-bold">Hello there</h1>
-          <p class="py-5">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to
-            featured content or information.</p>
-          <button class="btn btn-primary">Get Started</button>
+          <p class="py-5">Lorem, ipsum dolor sit amet consectetur adipisicing elit.</p>
+          <button class="btn btn-accent"
+            @click="$refs.content.scrollTo({top: $refs.content.scrollHeight, behavior: 'smooth'})">Get Started</button>
         </div>
       </div>
     </div>
+    <!-- Hero - End -->
 
-    <div class="container py-4 mx-auto sm:py-10">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" x-data="{cards: [] }"
-        x-init="cards = await (await fetch('https://fakestoreapi.com/products')).json()">
+    <!-- Content - Start -->
+    <div class="container py-4 mx-auto sm:py-10" x-data x-ref="content">
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center justify-items-center"
+        x-data="{cards: [] }" x-init="cards = await (await fetch('https://fakestoreapi.com/products')).json()">
 
         <template x-for="card in cards" :key="card.id">
-          <div class="card h-max bg-base-100 shadow-xl hover:shadow-2xl hover:scale-105 duration-300 cursor-pointer"
+          <div class="card bg-base-100 shadow-xl hover:shadow-2xl hover:scale-105 duration-300 cursor-pointer max-w-72"
             x-data @click="$dispatch('card-clicked', {card: card})">
-            <figure class="h-2/6">
-              <img class="h-full object-contain" :src="card.image" alt="Image" />
-            </figure>
+            <div class="max-h-80 p-[2rem]">
+              <img class="object-contain h-full" :src="card.image" alt="Image" />
+            </div>
             <div class="card-body">
               <h2 class="card-title">
                 <span x-text="card.title"></span>
-                <div class="badge badge-secondary">$<span x-text="card.price"></span></div>
+                <div class="badge badge-accent badge-lg">$<span x-text="card.price"></span></div>
               </h2>
               <!-- description is limited to 2 lines -->
-              <p class="flex-grow-0 truncate" x-text="card.description"></p>
+              <p class="flex-grow-1 truncate" x-text="card.description"></p>
               <div class="justify-end card-actions">
                 <div class="badge badge-outline" x-text="card.category"></div>
               </div>
@@ -142,39 +147,42 @@
 
       </div>
     </div>
+    <!-- Content - End -->
 
-    <!-- Modal - BEGIN-->
-    <dialog x-data="{ id: '', name: '', price: '', description: '' }" x-ref="modal" id="my_modal_3" class="modal"
-      @card-clicked.window="id=$event.detail.card.id; name = $event.detail.card.name; price = $event.detail.card.price; description = $event.detail.card.description; $refs.modal.showModal()">
-      <div class="modal-box">
+    <!-- Modal - Start-->
+    <dialog x-data="{ id: '', name: '', price: '', description: '', image: '', title: '' }" x-ref="modal"
+      id="my_modal_3" class="modal"
+      @card-clicked.window="id=$event.detail.card.id; name = $event.detail.card.name; price = $event.detail.card.price; description = $event.detail.card.description; image = $event.detail.card.image; title = $event.detail.card.title; $refs.modal.showModal()">
+      <div class="modal-box w-11/12 max-w-5xl">
 
         <form method="dialog">
           <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
         </form>
+        <h1 class="text-lg font-bold py-2" x-text="title"></h1>
 
-        <div class="mt-4 py-2 px-2">
-          <figure>
-            <img class="rounded-lg" src="/public/item-1.webp" alt="Shoes" />
-          </figure>
+        <div class="flex md:flex-row flex-col gap-4">
+          <div class="h-80 w-full">
+            <img class="rounded-lg object-contain h-full w-full" :src="image" alt="Image" />
+          </div>
 
-          <h3 class="text-lg font-bold" x-text="name"></h3>
-          <div class="badge badge-lg badge-info">$<span x-text="price"></span></div>
-          <p class="py-4" x-text="description"></p>
-          <div class="card-actions justify-end">
-            <button class="btn btn-primary" @click="$dispatch('item-added', {item: {id: id, price: price}})">Add to
-              cart</button>
+          <div class="flex flex-col gap-3">
+            <p x-text="description"></p>
+            <div class="card-actions justify-end">
+              <button class="btn btn-outline"
+                @click="$dispatch('item-added', {item: {id: id, price: price, image: image}})">
+                <div class="badge badge-lg badge-accent">$<span x-text="price"></span></div>
+                <span>Add to cart</span>
+              </button>
+            </div>
           </div>
         </div>
 
-
       </div>
-      <form method="dialog" class="modal-backdrop">
+      <form method="dialog" class="modal-backdrop bg-opacity-75 backdrop-blur-sm">
         <button>close</button>
       </form>
     </dialog>
-    <!-- Modal - END-->
-
-
+    <!-- Modal - End -->
 
   </div>
 
