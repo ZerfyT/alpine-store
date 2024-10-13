@@ -7,12 +7,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Alpine Store</title>
   <link rel="stylesheet" type="text/css" href="/style_build.css">
-  <script type="module"  src="/main.js"></script>
-  <script src="/script.js" ></script>
+  <script type="module" src="/main.js"></script>
+  <script src="/script.js"></script>
 </head>
 
 <body>
-  <div id="app">
+  <div id="app" x-data="getItems()" x-init="fetchItems()">
 
     <!-- Navbar - Start -->
     <div class="sticky top-0 z-30 navbar bg-base-100">
@@ -42,6 +42,12 @@
 
       <div class="navbar-end">
 
+        <!-- Search -->
+        <div class="form-control">
+          <input x-model="search" type="text" placeholder="Search" class="input input-bordered input-sm" />
+        </div>
+
+
         <!-- Cart -->
         <div class="dropdown dropdown-end" x-data="cart()" @item-added.window="addItem($event.detail.item)">
           <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
@@ -62,8 +68,8 @@
               <div class="flex flex-col gap-3">
                 <template x-for="(item, index) in cartItems" :key="index">
                   <div class="flex flex-row items-center justify-between gap-2">
-                    <div class="w-24 h-24">
-                      <img class="rounded object-fill h-full w-full" :src="item.image" alt="Image" />
+                    <div class="w-16 h-16">
+                      <img class="object-fill w-full h-full rounded" :src="item.image" alt="Image" />
                     </div>
                     <div class="badge badge-accent badge-lg">$<span x-text="item.price"></span></div>
                     <button type="button" class="btn btn-sm btn-circle btn-ghost" @click="removeItem(index)">✕</button>
@@ -77,15 +83,6 @@
             </div>
           </div>
         </div>
-
-
-        <!-- Search -->
-        <button class="btn btn-ghost btn-circle">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </button>
 
 
         <!-- Notifications -->
@@ -107,7 +104,7 @@
 
 
     <!-- Hero - Start -->
-    <div class="min-h-screen hero bg-base-200" x-data>
+    <div class="min-h-80 hero bg-base-200" x-data>
       <div class="text-center hero-content">
         <div class="max-w-md">
           <h1 class="text-5xl font-bold">Hello there</h1>
@@ -120,15 +117,14 @@
     <!-- Hero - End -->
 
     <!-- Content - Start -->
-    <div class="container py-4 mx-auto sm:py-10" x-data x-ref="content">
+    <div class="container py-4 mx-auto sm:py-10" x-ref="content">
       <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center justify-items-center"
-        x-data="{cards: [] }" x-init="cards = await (await fetch('https://fakestoreapi.com/products')).json()">
+        class="grid justify-center grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center">
 
-        <template x-for="card in cards" :key="card.id">
-          <div class="card bg-base-100 shadow-xl hover:shadow-2xl hover:scale-105 duration-300 cursor-pointer max-w-72"
+        <template x-for="card in filterItems" :key="card.id">
+          <div class="duration-300 shadow-xl cursor-pointer card bg-base-100 hover:shadow-2xl hover:scale-105 max-w-72"
             x-data @click="$dispatch('card-clicked', {card: card})">
-            <div class="max-h-80 p-[2rem]">
+            <div class="max-h-80 h-full p-[2rem]">
               <img class="object-contain h-full" :src="card.image" alt="Image" />
             </div>
             <div class="card-body">
@@ -137,7 +133,7 @@
                 <div class="badge badge-accent badge-lg">$<span x-text="card.price"></span></div>
               </h2>
               <!-- description is limited to 2 lines -->
-              <p class="flex-grow-1 truncate" x-text="card.description"></p>
+              <p class="truncate flex-grow-1" x-text="card.description"></p>
               <div class="justify-end card-actions">
                 <div class="badge badge-outline" x-text="card.category"></div>
               </div>
@@ -153,21 +149,21 @@
     <dialog x-data="{ id: '', name: '', price: '', description: '', image: '', title: '' }" x-ref="modal"
       id="my_modal_3" class="modal"
       @card-clicked.window="id=$event.detail.card.id; name = $event.detail.card.name; price = $event.detail.card.price; description = $event.detail.card.description; image = $event.detail.card.image; title = $event.detail.card.title; $refs.modal.showModal()">
-      <div class="modal-box w-11/12 max-w-5xl">
+      <div class="w-11/12 max-w-5xl modal-box">
 
         <form method="dialog">
-          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          <button class="absolute btn btn-sm btn-circle btn-ghost right-2 top-2">✕</button>
         </form>
-        <h1 class="text-lg font-bold py-2" x-text="title"></h1>
+        <h1 class="py-2 text-lg font-bold" x-text="title"></h1>
 
-        <div class="flex md:flex-row flex-col gap-4">
-          <div class="h-80 w-full">
-            <img class="rounded-lg object-contain h-full w-full" :src="image" alt="Image" />
+        <div class="flex flex-col gap-4 md:flex-row">
+          <div class="w-full h-80">
+            <img class="object-contain w-full h-full rounded-lg" :src="image" alt="Image" />
           </div>
 
           <div class="flex flex-col gap-3">
             <p x-text="description"></p>
-            <div class="card-actions justify-end">
+            <div class="justify-end card-actions">
               <button class="btn btn-outline"
                 @click="$dispatch('item-added', {item: {id: id, price: price, image: image}})">
                 <div class="badge badge-lg badge-accent">$<span x-text="price"></span></div>
@@ -178,7 +174,7 @@
         </div>
 
       </div>
-      <form method="dialog" class="modal-backdrop bg-opacity-75 backdrop-blur-sm">
+      <form method="dialog" class="bg-opacity-75 modal-backdrop backdrop-blur-sm">
         <button>close</button>
       </form>
     </dialog>

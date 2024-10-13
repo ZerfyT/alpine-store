@@ -5,7 +5,7 @@ function cart() {
 
         init() {
             this.cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-            this.totalPrice = this.cartItems.reduce((total, item) => total + item.price, 0);
+            this.totalPrice = this.cartItems.reduce((total, item) => Number.parseFloat(total + item.price).toFixed(2), 0);
         },
 
         addItem(item) {
@@ -28,6 +28,21 @@ function cart() {
                 localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
             }
         },
+
+    }
+}
+
+function getItems() {
+    return {
+        cards: [],
+        search: '',
+        async fetchItems() {
+            await fetch('data.json').then(response => response.json()).then(json => this.cards = json.items);
+        },
+
+        get filterItems() {
+            return this.cards.filter(item => item.title.toLowerCase().includes(this.search.toLowerCase()));
+        }
 
     }
 }
