@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alpine Store - Checkout</title>
+  <link rel="stylesheet" type="text/css" href="/style_build.css">
+  <script type="module" src="/main.js"></script>
+  <script src="/script.js"></script>
+</head>
+
+<body x-data="checkoutPage()" x-init="loadCart()">
+  <div id="app">
+
+    <!-- Navbar - Start -->
+    <div class="sticky top-0 z-30 navbar bg-base-100">
+      <div class="navbar-start">
+        <a href="/" class="text-xl btn btn-ghost">Alpine Store</a>
+      </div>
+      <div class="navbar-center">
+      </div>
+      <div class="navbar-end">
+      </div>
+    </div>
+    <!-- Navbar - End -->
+
+    <!-- Checkout Content - Start -->
+    <div class="container py-4 mx-auto sm:py-10">
+      <h1 class="mb-8 text-3xl font-bold text-center">Checkout</h1>
+
+      <!-- Payment Success Message - Start -->
+      <div x-show="paymentStatus === 'success'" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+        <div class="p-8 text-center rounded-lg shadow-xl bg-success text-success-content">
+          <h2 class="mb-4 text-2xl font-bold">Payment Successful!</h2>
+          <p>Your order is confirmed. You will be redirected to the homepage shortly.</p>
+        </div>
+      </div>
+      <!-- Payment Success Message - End -->
+
+      <!-- Empty Cart Message - Start -->
+      <div x-show="cartItems.length === 0 && paymentStatus !== 'processing'" class="py-10 text-center">
+        <h2 class="mb-4 text-2xl font-semibold">Your Cart is Empty</h2>
+        <p class="mb-6 text-gray-600">Looks like you haven't added anything to your cart yet.</p>
+        <a href="/" class="btn btn-primary">Continue Shopping</a>
+      </div>
+      <!-- Empty Cart Message - End -->
+
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2" x-show="cartItems.length > 0 && paymentStatus !== 'success'">
+
+        <!-- Cart Items - Start -->
+        <div>
+          <h2 class="mb-4 text-2xl font-semibold">Your Cart</h2>
+          <div class="space-y-4">
+            <template x-for="(item, index) in cartItems" :key="index">
+              <div class="flex items-center p-4 border rounded-lg shadow-sm bg-base-100">
+                <img :src="item.image" :alt="item.title" class="object-contain w-20 h-20 mr-4 rounded">
+                <div class="flex-grow">
+                  <h3 class="font-semibold" x-text="item.title ? item.title : 'Item Name'"></h3>
+                  <p class="text-sm text-gray-600">$<span x-text="item.price"></span></p>
+                </div>
+              </div>
+            </template>
+            <div class="pt-4 mt-4 border-t">
+              <div class="flex justify-between text-xl font-semibold">
+                <span>Total:</span>
+                <span>$<span x-text="totalPrice"></span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Cart Items - End -->
+
+        <!-- Payment Form - Start -->
+        <div>
+          <h2 class="mb-4 text-2xl font-semibold">Payment Details</h2>
+          <form @submit.prevent="submitPayment" class="p-6 space-y-4 border rounded-lg shadow-sm bg-base-100">
+            <div>
+              <label for="card_number" class="block text-sm font-medium text-gray-700">Card Number</label>
+              <input type="text" id="card_number" name="card_number"
+                class="w-full mt-1 input input-bordered" placeholder="xxxx xxxx xxxx xxxx" required>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="expiry_date" class="block text-sm font-medium text-gray-700">Expiry Date</label>
+                <input type="text" id="expiry_date" name="expiry_date" class="w-full mt-1 input input-bordered"
+                  placeholder="MM/YY" required>
+              </div>
+              <div>
+                <label for="cvv" class="block text-sm font-medium text-gray-700">CVV</label>
+                <input type="text" id="cvv" name="cvv" class="w-full mt-1 input input-bordered" placeholder="123"
+                  required>
+              </div>
+            </div>
+            <button type="submit" class="w-full btn btn-primary" :disabled="paymentStatus === 'processing'">
+                <span x-show="paymentStatus !== 'processing'">Pay Now</span>
+                <span x-show="paymentStatus === 'processing'" class="loading loading-spinner"></span>
+                <span x-show="paymentStatus === 'processing'">Processing...</span>
+            </button>
+          </form>
+        </div>
+        <!-- Payment Form - End -->
+
+      </div>
+    </div>
+    <!-- Checkout Content - End -->
+
+  </div>
+
+  <script>
+    function checkoutPage() {
+      return {
+        cartItems: [],
+        totalPrice: 0,
+        paymentStatus: null, // null, 'processing', 'success', 'failed'
+        loadCart() {
+          const savedCart = localStorage.getItem('cartItems');
+          if (savedCart) {
+            this.cartItems = JSON.parse(savedCart);
+          }
+          this.calculateTotal();
+          if (this.cartItems.length > 0 && typeof gtag === 'function') {
+            // GA Event: begin_checkout
+            const eventItems = this.cartItems.map(item => ({
+              item_id: item.id,
+              item_name: item.title,
+              price: parseFloat(item.price)
+            }));
+            gtag('event', 'begin_checkout', {
+              value: parseFloat(this.totalPrice),
+              items: eventItems
+            });
+          }
+        },
+        calculateTotal() {
+          this.totalPrice = this.cartItems.reduce((sum, item) => sum + parseFloat(item.price), 0).toFixed(2);
+        },
+        submitPayment() {
+          if (this.cartItems.length === 0) {
+            alert('Your cart is empty.');
+            return;
+          }
+          this.paymentStatus = 'processing';
+
+          // Simulate payment API call
+          setTimeout(() => {
+            // GA Event: purchase
+            if (typeof gtag === 'function') {
+                const eventItems = this.cartItems.map(item => ({
+                    item_id: item.id,
+                    item_name: item.title,
+                    price: parseFloat(item.price),
+                    quantity: 1 // Assuming quantity 1 for each item in cart
+                }));
+                gtag('event', 'purchase', {
+                    transaction_id: `T-${Date.now()}`, // Simple timestamp-based transaction ID
+                    value: parseFloat(this.totalPrice),
+                    items: eventItems
+                });
+            }
+
+            this.paymentStatus = 'success';
+            localStorage.removeItem('cartItems');
+
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 3000);
+          }, 1500);
+        }
+      }
+    }
+
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('checkoutPage', checkoutPage);
+    });
+  </script>
+
+</body>
+
+</html>

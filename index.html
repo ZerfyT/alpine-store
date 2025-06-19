@@ -7,6 +7,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Alpine Store</title>
   <link rel="stylesheet" type="text/css" href="/style_build.css">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'GA_MEASUREMENT_ID');
+  </script>
+  <!-- End Google Analytics -->
   <script type="module" src="/main.js"></script>
   <script src="/script.js"></script>
 </head>
@@ -49,8 +58,8 @@
 
 
         <!-- Cart -->
-        <div class="dropdown dropdown-end" x-data="cart()" @item-added.window="addItem($event.detail.item)">
-          <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+        <div class="dropdown dropdown-end" x-data="cart()" @item-added.window="addItem($event.detail.item)" x-init="init()">
+          <div tabindex="0" role="button" class="btn btn-ghost btn-circle" @click="viewCart()">
             <div class="indicator">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
@@ -79,6 +88,9 @@
 
               <div class="divider">
                 <button class="btn btn-sm btn-error" @click="clearCart()">Clear cart</button>
+              </div>
+              <div class="card-actions">
+                <a href="checkout.html" class="w-full btn btn-primary">Checkout</a>
               </div>
             </div>
           </div>
@@ -165,7 +177,7 @@
             <p x-text="description"></p>
             <div class="justify-end card-actions">
               <button class="btn btn-outline"
-                @click="$dispatch('item-added', {item: {id: id, price: price, image: image}})">
+                @click="$dispatch('item-added', {item: {id: id, title: title, price: price, image: image}})">
                 <div class="badge badge-lg badge-accent">$<span x-text="price"></span></div>
                 <span>Add to cart</span>
               </button>
